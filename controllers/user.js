@@ -69,7 +69,7 @@ const verifyUser = catchAsyncError(async (req, res, next) => {
       const token = await user.getJWTToken();
       return res.status(200).json({
         access_token: token,
-        message: "Token generated",
+        message: "User verified successfully",
         data: {
           _id: user._id,
           name: user.fullname,
@@ -166,6 +166,7 @@ const verifyForgotPassword = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("session expired", 401, res));
   }
   const valid = await user.campareForgotPasswordOtp(forgotPasswordOtp);
+  console.log("🚀 ~ verifyForgotPassword ~ valid:", valid);
   if (valid) {
     const resetToken = crypto.randomBytes(20).toString("hex");
     await UserModel.findOneAndUpdate(
@@ -184,8 +185,11 @@ const verifyForgotPassword = catchAsyncError(async (req, res, next) => {
       success: true,
       message: "OTP verified successfully",
       data: `Reset Token`,
+      email: email,
       token: resetToken,
     });
+  } else {
+    return res.status(400).json({ message: "please enter valid OTP" });
   }
 });
 // reset password
