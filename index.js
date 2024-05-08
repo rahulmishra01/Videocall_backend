@@ -5,13 +5,28 @@ const connectDB = require("./database");
 const userRoutes = require("./routes/user");
 const session = require("express-session");
 const http = require('http');
-const WebSocket = require('ws');
+const {Server} = require('socket.io')
 const app = express();
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
 
-app.use(cors());
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+const activeRooms = [];
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(
     session({
@@ -27,17 +42,28 @@ app.get("/", (req, res) => {
   res.send("app is running now");
 });
 
+io.on("connection", (socket) => {
+  socket.on("message", ({ room, message }) => {
+    socket.to(room).emit("receive-message", message);
+  });
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+  socket.on("join-room", (roomKey) => {
+    if(activeRooms.length > 0) {
+      let activeRoomKey = activeRooms[0];
+      activeRooms.splice(0,1);
+      console.log
+      socket.join(activeRoomKey)
+    }else{
+      socket.join(roomKey);
+      activeRooms.push(roomKey);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
   });
 });
 
-app.listen(process.env.port, () => {
+server.listen(process.env.port, () => {
   console.log("app is running this port", process.env.port);
 });
