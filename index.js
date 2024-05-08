@@ -25,7 +25,7 @@ const activeRooms = [];
 app.use(
   cors({
     origin: process.env.CORS_URL,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
