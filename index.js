@@ -51,25 +51,29 @@ io.on("connection", (socket) => {
 
   socket.on("join-room", (roomKey) => {
     let joinedRoom;
+    let isWaiting = true;
     if(availableRooms.length > 0) {
       let availableRoomKey = availableRooms[0];
       const roomObj = activeRooms.find((obj) => obj.roomId === availableRoomKey);
       if(!roomObj.connectedUsers.includes(socket.id)){
+        isWaiting=false
         joinedRoom = availableRoomKey;
         availableRooms.splice(0,1);
         socket.join(availableRoomKey);
         roomObj.connectedUsers.push(socket.id);
+        
       }
     }else{
       socket.join(roomKey);
       joinedRoom = roomKey;
+      isWaiting=true
       availableRooms.push(roomKey);
       activeRooms.push({
         roomId: roomKey,
         connectedUsers: [socket.id]
       })
     }
-    socket.emit("joined-room", joinedRoom);
+    io.to(joinedRoom).emit("joined-room", {joinedRoom, flag:isWaiting})
   });
 
   socket.on("leave-room", (roomId) => {
