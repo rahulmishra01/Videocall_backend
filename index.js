@@ -45,7 +45,6 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("user connected", socket.id)
   socket.on("message", ({ room, message }) => {
     socket.to(room).emit("receive-message", message);
   });
@@ -54,11 +53,13 @@ io.on("connection", (socket) => {
     let joinedRoom;
     if(availableRooms.length > 0) {
       let availableRoomKey = availableRooms[0];
-      joinedRoom = availableRoomKey;
-      availableRooms.splice(0,1);
-      socket.join(availableRoomKey);
-      const room = availableRooms.find((obj) => obj.roomId === availableRoomKey);
-      room.connectedUsers.push(socket.id);
+      const roomObj = activeRooms.find((obj) => obj.roomId === availableRoomKey);
+      if(!roomObj.connectedUsers.includes(socket.id)){
+        joinedRoom = availableRoomKey;
+        availableRooms.splice(0,1);
+        socket.join(availableRoomKey);
+        roomObj.connectedUsers.push(socket.id);
+      }
     }else{
       socket.join(roomKey);
       joinedRoom = roomKey;
@@ -68,11 +69,24 @@ io.on("connection", (socket) => {
         connectedUsers: [socket.id]
       })
     }
-    console.log("user with socket id " , socket.id, "joined room", joinedRoom);
+    socket.emit("joined-room", joinedRoom);
+  });
+
+  socket.on("leave-room", (roomId) => {
+    socket.leave(roomId);
   });
 
   socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
+    const roomObj = activeRooms.find((obj) => obj.connectedUsers.includes(socket.id));
+    const roomKey = roomObj?.roomId;
+    if(roomObj) {
+      io.to(roomObj.roomId).emit("user-disconnected", {disconnectedUser: socket.id});
+      activeRooms.splice(activeRooms.indexOf(roomObj),1);
+    }
+    if(roomKey){
+      const index = availableRooms.indexOf(roomKey);
+      availableRooms.splice(index,1);
+    }
   });
 });
 
