@@ -6,7 +6,6 @@ const userRoutes = require("./routes/user");
 const session = require("express-session");
 const http = require('http');
 const {Server} = require('socket.io');
-const { connect } = require("http2");
 const app = express();
 const port = process.env.port || 5000
 const server = http.createServer(app);
@@ -14,7 +13,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CORS_URL,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
@@ -46,6 +45,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   socket.on("message", ({ room, message }) => {
+    console.log("🚀 ~ socket.on ~ room:", room, message)
     socket.to(room).emit("receive-message", message);
   });
 
