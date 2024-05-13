@@ -51,17 +51,16 @@ io.on("connection", (socket) => {
 
   socket.on("join-room", (roomKey) => {
     let joinedRoom;
-    let isWaiting = true;
+    let isWaiting = true;    
     if(availableRooms.length > 0) {
       let availableRoomKey = availableRooms[0];
       const roomObj = activeRooms.find((obj) => obj.roomId === availableRoomKey);
-      if(!roomObj.connectedUsers.includes(socket.id)){
+      if(!roomObj.connectedUsers.includes(socket.id) ){
         isWaiting=false
         joinedRoom = availableRoomKey;
-        availableRooms.splice(0,1);
+        availableRooms.splice(availableRooms.indexOf(availableRoomKey),1);
         socket.join(availableRoomKey);
         roomObj.connectedUsers.push(socket.id);
-        
       }
     }else{
       socket.join(roomKey);
@@ -73,12 +72,26 @@ io.on("connection", (socket) => {
         connectedUsers: [socket.id]
       })
     }
+    console.log(activeRooms);
+    console.log(availableRooms);
     io.to(joinedRoom).emit("joined-room", {joinedRoom, flag:isWaiting})
   });
 
   socket.on("leave-room", (roomId) => {
     socket.leave(roomId);
   });
+
+  socket.on("exit-chat" , (roomId) => {
+    socket.leave(roomId);
+    const roomObj = activeRooms.find( (obj) => obj.roomId === roomId);
+    if(roomObj){
+      activeRooms.splice(activeRooms.indexOf(roomObj), 1);
+    }
+    if(availableRooms.includes(roomId)){
+      availableRooms.splice(availableRooms.indexOf(roomId), 1);
+    }
+    io.to(roomId).emit("chat-closed", {leavedUser : socket.id, roomKey : roomId})
+  })
 
   socket.on("disconnect", () => {
     const roomObj = activeRooms.find((obj) => obj.connectedUsers.includes(socket.id));
