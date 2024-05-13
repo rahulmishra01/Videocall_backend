@@ -91,6 +91,7 @@ io.on("connection", (socket) => {
       availableRooms.splice(availableRooms.indexOf(roomId), 1);
     }
     io.to(roomId).emit("chat-closed", {leavedUser : socket.id, roomKey : roomId})
+    console.log("availableRooms, activeRooms===========>",availableRooms, activeRooms);
   })
 
   socket.on("disconnect", () => {
