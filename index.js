@@ -9,6 +9,7 @@ const {Server} = require('socket.io');
 const app = express();
 const port = process.env.port || 5000
 const server = http.createServer(app);
+const { ExpressPeerServer } = require('peer');
 
 const io = new Server(server, {
   cors: {
@@ -17,6 +18,12 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
+const peerServer = ExpressPeerServer(server, {
+  path: '/peerjs',
+});
+
+app.use('/peerjs', peerServer);
 
 const availableRooms = [];
 const activeRooms = [];
