@@ -21,6 +21,7 @@ const io = new Server(server, {
 
 const peerServer = ExpressPeerServer(server, {
   path: '/videoChat',
+  port: port,
   proxied: true,
   ssl: {},
   debug: true,
