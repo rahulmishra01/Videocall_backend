@@ -25,6 +25,19 @@ const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
 
+peerServer.on('connection', (client) => {
+  console.log('Peer connected: ', client.id);
+});
+
+peerServer.on('disconnect', (client) => {
+  console.log('Peer disconnected: ', client.id);
+});
+
+peerServer.on('error', (err) => {
+  console.error('PeerJS error: ', err);
+});
+
+
 const availableRooms = [];
 const activeRooms = [];
 
@@ -44,6 +57,9 @@ app.use(
     })
   );
 app.use('/peerjs', peerServer);
+
+
+
 connectDB();
 app.use("/api/user", userRoutes);
 app.get("/", (req, res) => {
