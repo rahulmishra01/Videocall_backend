@@ -20,7 +20,7 @@ const io = new Server(server, {
 });
 
 const peerServer = ExpressPeerServer(server, {
-  port: 10001,
+  port: port,
   path: '/peerjs',
   debug: true,
 });
