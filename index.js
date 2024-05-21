@@ -21,9 +21,10 @@ const io = new Server(server, {
 
 const peerServer = ExpressPeerServer(server, {
   path: '/peerjs',
+  debug: true
 });
 
-app.use('/peerjs', peerServer);
+
 
 const availableRooms = [];
 const activeRooms = [];
@@ -43,7 +44,7 @@ app.use(
       saveUninitialized: false,
     })
   );
-
+app.use('/peerjs', peerServer);
 connectDB();
 app.use("/api/user", userRoutes);
 app.get("/", (req, res) => {
