@@ -20,9 +20,13 @@ const io = new Server(server, {
 });
 
 const peerServer = ExpressPeerServer(server, {
-  path: '/peerjs',
+  path: '/videoChat',
+  proxied: true,
+  ssl: {},
+  debug: true,
 });
 
+app.use(peerServer);
 peerServer.on('connection', (client) => {
   console.log('Peer connected: ', client.id);
 });
@@ -54,7 +58,7 @@ app.use(
       saveUninitialized: false,
     })
   );
-app.use('/peerjs', peerServer);
+// app.use('/peerjs', peerServer);
 
 
 
