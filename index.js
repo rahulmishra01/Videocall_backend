@@ -7,7 +7,7 @@ const session = require("express-session");
 const http = require('http');
 const {Server} = require('socket.io');
 const app = express();
-const port = process.env.port || 5000
+const port = process.env.PORT || 5000
 const server = http.createServer(app);
 const { ExpressPeerServer } = require('peer');
 
