@@ -20,12 +20,10 @@ const io = new Server(server, {
 });
 
 const peerServer = ExpressPeerServer(server, {
-  port: 443,
+  port: 10001,
   path: '/peerjs',
   debug: true,
 });
-
-
 
 const availableRooms = [];
 const activeRooms = [];
