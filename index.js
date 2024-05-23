@@ -9,7 +9,7 @@ const {Server} = require('socket.io');
 const app = express();
 const port = process.env.PORT || 5000
 const server = http.createServer(app);
-const { ExpressPeerServer } = require('peer');
+// const { ExpressPeerServer } = require('peer');
 
 const io = new Server(server, {
   cors: {
@@ -19,26 +19,26 @@ const io = new Server(server, {
   },
 });
 
-const peerServer = ExpressPeerServer(server, {
-  path: '/videoChat',
-  port: port,
-  proxied: true,
-  ssl: {},
-  debug: true,
-});
+// const peerServer = ExpressPeerServer(server, {
+//   path: '/videoChat',
+//   port: port,
+//   proxied: true,
+//   ssl: {},
+//   debug: true,
+// });
 
-app.use(peerServer);
-peerServer.on('connection', (client) => {
-  console.log('Peer connected: ', client.id);
-});
+// app.use(peerServer);
+// peerServer.on('connection', (client) => {
+//   console.log('Peer connected: ', client.id);
+// });
 
-peerServer.on('disconnect', (client) => {
-  console.log('Peer disconnected: ', client.id);
-});
+// peerServer.on('disconnect', (client) => {
+//   console.log('Peer disconnected: ', client.id);
+// });
 
-peerServer.on('error', (err) => {
-  console.error('PeerJS error: ', err);
-});
+// peerServer.on('error', (err) => {
+//   console.error('PeerJS error: ', err);
+// });
 
 
 const availableRooms = [];
