@@ -120,14 +120,6 @@ io.on("connection", (socket) => {
     console.log("availableRooms, activeRooms===========>",availableRooms, activeRooms);
   })
 
-  socket.on("callUser", ({ from, to }) => {
-    io.to(to).emit("ring", { from });
-  });
-
-  socket.on("answerCall", ({ to, signal }) => {
-    io.to(to).emit("callAccepted", signal);
-  });
-
   socket.on("disconnect", () => {
     const roomObj = activeRooms.find((obj) => obj.connectedUsers.includes(socket.id));
     const roomKey = roomObj?.roomId;
